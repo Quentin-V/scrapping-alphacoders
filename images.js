@@ -3,21 +3,20 @@ const jsdom = require("jsdom")
 const fs = require('fs')
 const {downloadRequest} = require('./scrapping-functions.js')
 
-// example link                                                     v Category name
-// https://wall.alphacoders.com/by_sub_category.php?id=344100&name=Tokyo+Revengers+Wallpapers
-//                                                      ^ categoryID
+// example link                                 v Category id
+// https://pics.alphacoders.com/by_sub_category/344100
+
 const categoryId = '344100'
-const categoryName = 'Tokyo+Revengers+Wallpapers'
-const maxPageNb = 6
+const maxPageNb = 1
 const outputFolder = './tokyorevengers_output'
-const filePrefix = 'bg_'
+const filePrefix = 'img_'
 
 for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
 
     const optionsGetBgInfo = { // Options to scrap all informations about the bg
-        hostname: 'wall.alphacoders.com',
+        hostname: 'pics.alphacoders.com',
         port: 443,
-        path: `/by_sub_category.php?id=${categoryId}&name=${categoryName}&page=${pageNb}`,
+        path: `/by_sub_category/${categoryId}?page=${pageNb}`,
         method: 'GET'
     }
 
@@ -37,11 +36,11 @@ for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
             const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
             downloadBtns.forEach(dlb => {
                 let data = dlb.dataset
-                // DOWNLOAD LINK : https://initiate.alphacoders.com/download/wallpaper/${id}/${server}/${format}/
+                // link: "https://initiate.alphacoders.com/download/picture/461825/png  &"
                 const optionsDownload = {
                     hostname: 'initiate.alphacoders.com',
                     port: 443,
-                    path: `/download/wallpaper/${data.id}/${data.server}/${data.type}`,
+                    path: `/download/picture/${data.id}/${data.type}`,
                     method: 'GET'
                 }
                 downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)

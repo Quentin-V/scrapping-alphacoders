@@ -3,21 +3,20 @@ const jsdom = require("jsdom")
 const fs = require('fs')
 const {downloadRequest} = require('./scrapping-functions.js')
 
-// example link                                                     v Category name
-// https://wall.alphacoders.com/by_sub_category.php?id=344100&name=Tokyo+Revengers+Wallpapers
-//                                                      ^ categoryID
+// example link
+// https://mobile.alphacoders.com/by-sub-category/344100
+//                                                ^ categoryID
 const categoryId = '344100'
-const categoryName = 'Tokyo+Revengers+Wallpapers'
-const maxPageNb = 6
+const maxPageNb = 4
 const outputFolder = './tokyorevengers_output'
-const filePrefix = 'bg_'
+const filePrefix = 'mbg_'
 
 for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
 
     const optionsGetBgInfo = { // Options to scrap all informations about the bg
-        hostname: 'wall.alphacoders.com',
+        hostname: 'mobile.alphacoders.com',
         port: 443,
-        path: `/by_sub_category.php?id=${categoryId}&name=${categoryName}&page=${pageNb}`,
+        path: `/by-sub-category/${categoryId}?page=${pageNb}`,
         method: 'GET'
     }
 
@@ -34,17 +33,21 @@ for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
                 fs.mkdirSync(outputFolder)
             }
             const dom = new jsdom.JSDOM(response)
-            const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
-            downloadBtns.forEach(dlb => {
-                let data = dlb.dataset
-                // DOWNLOAD LINK : https://initiate.alphacoders.com/download/wallpaper/${id}/${server}/${format}/
+            const imageElements = dom.window.document.querySelectorAll('.img-responsive') // get  all the images
+            const images = []
+            imageElements.forEach(im => {
+                let idAndType = im.src.substr(im.src.lastIndexOf('/thumb-')+'/thumb-'.length).split('.')
+                images.push({id: idAndType[0], type: idAndType[1]})
+            })
+            images.forEach(image => {
+                // link: https://initiate.alphacoders.com/download/mobile-wallpaper/933879/jpg
                 const optionsDownload = {
                     hostname: 'initiate.alphacoders.com',
                     port: 443,
-                    path: `/download/wallpaper/${data.id}/${data.server}/${data.type}`,
+                    path: `/download/mobile-wallpaper/${image.id}/${image.type}`,
                     method: 'GET'
                 }
-                downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)
+                downloadRequest(optionsDownload, outputFolder, filePrefix, image.id, image.type)
             })
         })
     })
