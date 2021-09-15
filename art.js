@@ -18,7 +18,7 @@ fileCount = tot = 0
 const optionsMaxPage = {
     hostname: 'art.alphacoders.com',
     port: 443,
-    path: `/by_${collOrCat}/${categoryId}`,
+    path: `${collOrCat === 'collection' ? '/arts' : ''}/by_${collOrCat}/${categoryId}`,
     method: 'GET'
 };
 
@@ -30,7 +30,7 @@ const optionsMaxPage = {
         const optionsGetBgInfo = { // Options to scrap all informations about the bg
             hostname: 'art.alphacoders.com',
             port: 443,
-            path: `/by_${collOrCat}/${categoryId}?page=${pageNb}`,
+            path: `${collOrCat === 'collection' ? '/arts' : ''}/by_${collOrCat}/${categoryId}?page=${pageNb}`,
             method: 'GET'
         }
 
