@@ -10,11 +10,12 @@ const config = require('./config.js')
 const categoryId = config.categoryId
 const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixMobileWp
+const collOrCat = config.collectionOrCategory.replaceAll('_', '-')
 
 const optionsMaxPage = {
     hostname: 'mobile.alphacoders.com',
     port: 443,
-    path: `/by-sub-category/${categoryId}`,
+    path: `/by-${collOrCat}/${categoryId}`,
     method: 'GET'
 };
 
@@ -26,7 +27,7 @@ const optionsMaxPage = {
         const optionsGetBgInfo = { // Options to scrap all informations about the bg
             hostname: 'mobile.alphacoders.com',
             port: 443,
-            path: `/by-sub-category/${categoryId}?page=${pageNb}`,
+            path: `/by-${collOrCat}/${categoryId}?page=${pageNb}`,
             method: 'GET'
         }
 

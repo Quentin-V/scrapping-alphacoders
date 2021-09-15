@@ -11,11 +11,12 @@ const categoryId = config.categoryId
 const categoryName = config.categoryName
 const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixWp
+const collOrCat = config.collectionOrCategory
 
 const optionsMaxPage = {
     hostname: 'wall.alphacoders.com',
     port: 443,
-    path: `/by_sub_category.php?id=${categoryId}&name=${categoryName}`,
+    path: `/by_${collOrCat}.php?id=${categoryId}&name=${categoryName}`,
     method: 'GET'
 };
 
@@ -27,7 +28,7 @@ const optionsMaxPage = {
         const optionsGetBgInfo = { // Options to scrap all informations about the bg
             hostname: 'wall.alphacoders.com',
             port: 443,
-            path: `/by_sub_category.php?id=${categoryId}&name=${categoryName}&page=${pageNb}`,
+            path: `/by_${collOrCat}.php?id=${categoryId}&name=${categoryName}&page=${pageNb}`,
             method: 'GET'
         }
 
