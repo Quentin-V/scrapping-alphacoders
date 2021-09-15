@@ -7,7 +7,7 @@ module.exports = {
     downloadRequest: (options, outputFolder, filePrefix, id, type, count, tot) => {
         const reqDownload = https.request(options, resDownload => {
             const file = fs.createWriteStream(`${outputFolder}/${filePrefix}${id}.${type}`);
-            console.log(`Starting download of ${id}.${type} (${count/tot})`)
+            console.log(`Starting download of ${id}.${type} (${count+'/'+tot})`)
             resDownload.on('data', chunk => {
                 file.write(chunk)
             })
