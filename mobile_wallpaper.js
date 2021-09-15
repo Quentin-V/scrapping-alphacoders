@@ -12,6 +12,9 @@ const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixMobileWp
 const collOrCat = config.collectionOrCategory.replaceAll('_', '-')
 
+let fileCount, tot
+fileCount = tot = 0
+
 const optionsMaxPage = {
     hostname: 'mobile.alphacoders.com',
     port: 443,
@@ -50,8 +53,13 @@ const optionsMaxPage = {
                     let idAndType = im.src.substr(im.src.lastIndexOf('/thumb-')+'/thumb-'.length).split('.')
                     images.push({id: idAndType[0], type: idAndType[1]})
                 })
+                tot += images.length
                 console.log(`Sending download requests for page n°${pageNb}`)
                 images.forEach(image => {
+                    if(fs.existsSync(`${outputFolder}/${filePrefix}${image.id}.${image.type}`)) {
+                        console.log(`File ${filePrefix}${image.id}.${image.type} already exists, skipping...`)
+                        return;
+                    }
                     // link: https://initiate.alphacoders.com/download/mobile-wallpaper/933879/jpg
                     const optionsDownload = {
                         hostname: 'initiate.alphacoders.com',
@@ -59,7 +67,7 @@ const optionsMaxPage = {
                         path: `/download/mobile-wallpaper/${image.id}/${image.type}`,
                         method: 'GET'
                     }
-                    downloadRequest(optionsDownload, outputFolder, filePrefix, image.id, image.type)
+                    downloadRequest(optionsDownload, outputFolder, filePrefix, image.id, image.type, ++fileCount, tot)
                 })
             })
         })

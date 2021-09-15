@@ -3,14 +3,11 @@ const https = require("https");
 const fs = require("fs");
 
 module.exports = {
-    downloadRequest: (options, outputFolder, filePrefix, id, type) => {
+
+    downloadRequest: (options, outputFolder, filePrefix, id, type, count, tot) => {
         const reqDownload = https.request(options, resDownload => {
-            if(fs.existsSync(`${outputFolder}/${filePrefix}${id}.${type}`)) {
-                console.log(`File ${filePrefix}${id}.${type} already exists, skipping...`)
-                return;
-            }
             const file = fs.createWriteStream(`${outputFolder}/${filePrefix}${id}.${type}`);
-            console.log(`Starting download of ${id}.${type}`)
+            console.log(`Starting download of ${id}.${type} (${count/tot})`)
             resDownload.on('data', chunk => {
                 file.write(chunk)
             })

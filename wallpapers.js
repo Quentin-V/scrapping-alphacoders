@@ -13,6 +13,9 @@ const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixWp
 const collOrCat = config.collectionOrCategory
 
+let fileCount, tot
+fileCount = tot = 0
+
 const optionsMaxPage = {
     hostname: 'wall.alphacoders.com',
     port: 443,
@@ -46,17 +49,23 @@ const optionsMaxPage = {
                 }
                 const dom = new jsdom.JSDOM(response)
                 const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
+                tot += downloadBtns.length
                 console.log(`Sending download requests for page n°${pageNb}`)
                 downloadBtns.forEach(dlb => {
                     let data = dlb.dataset
+                    if(fs.existsSync(`${outputFolder}/${filePrefix}${data.id}.${data.type}`)) {
+                        console.log(`File ${filePrefix}${data.id}.${data.type} already exists, skipping...`)
+                        return;
+                    }
                     // DOWNLOAD LINK : https://initiate.alphacoders.com/download/wallpaper/${id}/${server}/${format}/
+
                     const optionsDownload = {
                         hostname: 'initiate.alphacoders.com',
                         port: 443,
                         path: `/download/wallpaper/${data.id}/${data.server}/${data.type}`,
                         method: 'GET'
                     }
-                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)
+                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type, ++fileCount, tot)
                 })
             })
         })

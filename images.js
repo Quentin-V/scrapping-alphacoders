@@ -12,6 +12,9 @@ const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixMobileWp
 const collOrCat = config.collectionOrCategory
 
+let fileCount, tot
+fileCount = tot = 0
+
 const optionsMaxPage = {
     hostname: 'pics.alphacoders.com',
     port: 443,
@@ -45,9 +48,14 @@ const optionsMaxPage = {
                 }
                 const dom = new jsdom.JSDOM(response)
                 const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
+                tot += downloadBtns.length
                 console.log(`Sending download requests for page n°${pageNb}`)
                 downloadBtns.forEach(dlb => {
                     let data = dlb.dataset
+                    if(fs.existsSync(`${outputFolder}/${filePrefix}${data.id}.${data.type}`)) {
+                        console.log(`File ${filePrefix}${data.id}.${data.type} already exists, skipping...`)
+                        return;
+                    }
                     // link: "https://initiate.alphacoders.com/download/picture/461825/png  &"
                     const optionsDownload = {
                         hostname: 'initiate.alphacoders.com',
@@ -55,7 +63,7 @@ const optionsMaxPage = {
                         path: `/download/picture/${data.id}/${data.type}`,
                         method: 'GET'
                     }
-                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)
+                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type, ++fileCount, tot)
                 })
             })
         })
