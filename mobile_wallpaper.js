@@ -10,7 +10,7 @@ const config = require('./config.js')
 const categoryId = config.categoryId
 const outputFolder = config.outputFolder
 const filePrefix = config.filePrefixMobileWp
-const collOrCat = config.collectionOrCategory.replaceAll('_', '-')
+const collOrCat = config.collectionOrCategory.replace('_', '-')
 
 let fileCount, tot
 fileCount = tot = 0
