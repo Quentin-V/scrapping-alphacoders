@@ -9,7 +9,7 @@ const config = require('./config.js')
 
 const categoryId = config.categoryId
 const outputFolder = config.outputFolder
-const filePrefix = config.filePrefixMobileWp
+const filePrefix = config.filePrefixArt
 const collOrCat = config.collectionOrCategory
 
 let fileCount, tot
