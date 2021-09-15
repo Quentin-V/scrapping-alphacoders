@@ -1,58 +1,71 @@
 const https = require('https')
 const jsdom = require("jsdom")
 const fs = require('fs')
-const {downloadRequest} = require('./scrapping-functions.js')
+const {downloadRequest, getMaxPage} = require('./scrapping-functions.js')
+const config = require('./config.js')
 
 // example link                                 v Category id
 // https://pics.alphacoders.com/by_sub_category/344100
 
-const categoryId = '344100'
-const maxPageNb = 1
-const outputFolder = './tokyorevengers_output'
-const filePrefix = 'img_'
+const categoryId = config.categoryId
+const outputFolder = config.outputFolder
+const filePrefix = config.filePrefixMobileWp
 
-for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
+const optionsMaxPage = {
+    hostname: 'pics.alphacoders.com',
+    port: 443,
+    path: `/by_sub_category/${categoryId}`,
+    method: 'GET'
+};
 
-    const optionsGetBgInfo = { // Options to scrap all informations about the bg
-        hostname: 'pics.alphacoders.com',
-        port: 443,
-        path: `/by_sub_category/${categoryId}?page=${pageNb}`,
-        method: 'GET'
-    }
+(async () => {
+    const maxPageNb = await getMaxPage(optionsMaxPage)
+    console.log(`Found ${maxPageNb} pages, fetching started`)
+    for(let pageNb = 1; pageNb <= maxPageNb; ++pageNb) { // For each page
 
-    let response = ''
-    const reqGetPage = https.request(optionsGetBgInfo, res => { // Create request and get the page
-        console.log(`Starting fetching of page n°${pageNb}`)
-        res.on('data', d => {
-            response += d
-        })
-        res.on('end', () => {
-            console.log(`Fetched page n°${pageNb}`)
-            if(!fs.existsSync(outputFolder)) {
-                console.log(`Output folder not found, creating it...`)
-                fs.mkdirSync(outputFolder)
-            }
-            const dom = new jsdom.JSDOM(response)
-            const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
-            downloadBtns.forEach(dlb => {
-                let data = dlb.dataset
-                // link: "https://initiate.alphacoders.com/download/picture/461825/png  &"
-                const optionsDownload = {
-                    hostname: 'initiate.alphacoders.com',
-                    port: 443,
-                    path: `/download/picture/${data.id}/${data.type}`,
-                    method: 'GET'
+        const optionsGetBgInfo = { // Options to scrap all informations about the bg
+            hostname: 'pics.alphacoders.com',
+            port: 443,
+            path: `/by_sub_category/${categoryId}?page=${pageNb}`,
+            method: 'GET'
+        }
+
+        let response = ''
+        const reqGetPage = https.request(optionsGetBgInfo, res => { // Create request and get the page
+            console.log(`Starting fetching of page n°${pageNb}`)
+            res.on('data', d => {
+                response += d
+            })
+            res.on('end', () => {
+                console.log(`Fetched page n°${pageNb}`)
+                if(!fs.existsSync(outputFolder)) {
+                    console.log(`Output folder not found, creating it...`)
+                    fs.mkdirSync(outputFolder)
                 }
-                downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)
+                const dom = new jsdom.JSDOM(response)
+                const downloadBtns = dom.window.document.querySelectorAll('.download-button') // get the download buttons
+                console.log(`Sending download requests for page n°${pageNb}`)
+                downloadBtns.forEach(dlb => {
+                    let data = dlb.dataset
+                    // link: "https://initiate.alphacoders.com/download/picture/461825/png  &"
+                    const optionsDownload = {
+                        hostname: 'initiate.alphacoders.com',
+                        port: 443,
+                        path: `/download/picture/${data.id}/${data.type}`,
+                        method: 'GET'
+                    }
+                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type)
+                })
             })
         })
-    })
 
-    reqGetPage.on('error', error => { // If error on
-        console.error(`Error while fetching download links, error: ${error}`)
-    })
+        reqGetPage.on('error', error => { // If error on
+            console.error(`Error while fetching download links, error: ${error}`)
+        })
 
-    reqGetPage.end()
-}
+        reqGetPage.end()
+    }
+})()
+
 
 
