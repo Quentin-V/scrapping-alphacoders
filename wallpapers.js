@@ -65,7 +65,7 @@ const optionsMaxPage = {
                         path: `/download/wallpaper/${data.id}/${data.server}/${data.type}`,
                         method: 'GET'
                     }
-                    downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type, ++fileCount, tot)
+                    await downloadRequest(optionsDownload, outputFolder, filePrefix, data.id, data.type, ++fileCount, tot).catch(err => console.log(err))
                 })
             })
         })
